@@ -1,0 +1,22 @@
+// ฟังก์ชันคำนวณพื้นที่จาก ไร่-งาน-วา เป็นตารางเมตร
+export const convertToSqMeters = (rai = 0, ngan = 0, wa = 0) => {
+  return (Number(rai) * 1600) + (Number(ngan) * 400) + (Number(wa) * 4);
+};
+
+// ฟังก์ชันหาเส้นรอบรูป (สมมติว่าเป็นสี่เหลี่ยมจัตุรัสเพื่อประเมินคร่าวๆ)
+export const getPerimeterFromArea = (sqMeters) => {
+  if (sqMeters <= 0) return 0;
+  return Math.sqrt(sqMeters) * 4;
+};
+
+// ฟังก์ชันคำนวณวัสดุทั้งหมด
+export const calculateFenceMaterials = (perimeter, layers, spacing = 2.5) => {
+  const wireLength = (perimeter * layers) * 1.1; // เผื่อระยะมัด 10%
+  const posts = Math.ceil(perimeter / spacing);
+  return {
+    wireLength: Math.round(wireLength),
+    posts: posts,
+    rolls50m: Math.ceil(wireLength / 50),
+    rolls100m: Math.ceil(wireLength / 100)
+  };
+};

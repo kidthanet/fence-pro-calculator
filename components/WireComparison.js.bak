@@ -1,0 +1,27 @@
+export default function WireComparison({ totalRolls }) {
+  const options = [
+    { grade: "เบอร์ 14 ขนาด 5 กก.", price: 520, features: "นิยมที่สุด, ราคาประหยัด" },
+    { grade: "เบอร์ 12 ขนาด 10 กก.", price: 510, features: "ทนทานสูง, อายุการใช้งานยาวนาน" },
+    { grade: "ลวดหนามหีบเพลง BTO-22", price:1485, features: "เพิ่มระดับความปลอดภัย,สิ่งของภายในพื้นที่ที่กำหนด" }
+  ];
+
+  return (
+    <div className="mt-6">
+      <h3 className="text-sm font-bold text-gray-700 mb-3">เปรียบเทียบประเภทลวดหนาม (PK Group)</h3>
+      <div className="grid gap-2">
+        {options.map((opt, i) => (
+          <div key={i} className="flex justify-between items-center p-3 bg-white border rounded-lg text-sm hover:border-blue-500 transition cursor-default">
+            <div>
+              <p className="font-semibold text-gray-800">{opt.grade}</p>
+              <p className="text-[10px] text-gray-500">{opt.features}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-blue-600 font-bold">฿{(opt.price * totalRolls).toLocaleString()}</p>
+              <p className="text-[10px] text-gray-400">ประมาณการรวม</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

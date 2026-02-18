@@ -1,0 +1,118 @@
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { sarabunBase64 } from './fontData';
+
+/**
+ * ฟังก์ชันสร้างใบเสนอราคา PDF 
+ * รองรับภาษาไทยสมบูรณ์แบบโดยใช้ Base64 Font
+ */
+export const generateQuotation = (data) => {
+  if (!data) {
+    alert("ไม่พบข้อมูลสำหรับการสร้าง PDF");
+    return;
+  }
+
+  const doc = new jsPDF();
+  const fontName = "Sarabun";
+
+  // 1. นำฟอนต์จาก fontData.js เข้าสู่ระบบ VFS ของ jsPDF
+  try {
+    doc.addFileToVFS(`${fontName}-Regular.ttf`, sarabunBase64);
+    doc.addFont(`${fontName}-Regular.ttf`, fontName, "normal");
+    doc.setFont(fontName);
+  } catch (error) {
+    console.error("Error loading Thai font:", error);
+  }
+
+  // 2. ออกแบบหัวเอกสาร (Header)
+  doc.setFontSize(22);
+  doc.setTextColor(30, 58, 138); // Blue-900
+  doc.text("ใบประเมินราคาวัสดุล้อมรั้ว", 105, 20, { align: "center" });
+
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text("ประมาณการโดยเครื่องมือ Fence Pro Calculator", 105, 27, { align: "center" });
+  doc.text("สนับสนุนโดย PK Group (www.pkgroupth.com)", 105, 32, { align: "center" });
+
+  // เส้นคั่นหัวกระดาษ
+  doc.setDrawColor(200);
+  doc.line(15, 38, 195, 38);
+
+  // 3. รายละเอียดข้อมูลพื้นที่
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text("รายละเอียดพื้นที่และข้อกำหนด", 15, 48);
+  
+  doc.setFontSize(11);
+  const details = [
+    `ความยาวรั้วรอบพื้นที่: ${data.perimeter.toLocaleString()} เมตร`,
+    `จำนวนชั้นลวดหนามที่ต้องการ: ${data.layers} ชั้น`,
+    `ระยะห่างระหว่างเสา: ${data.postSpacing} เมตร`,
+    `ความยาวลวดหนามต่อม้วน: ${data.rollLength || 50} เมตร`,
+    `วันที่ประเมิน: ${new Date().toLocaleDateString('th-TH')}`
+  ];
+  
+  details.forEach((text, index) => {
+    doc.text(text, 20, 56 + (index * 7));
+  });
+
+  // 4. ตารางรายการวัสดุ (AutoTable)
+  // ส่วนสำคัญ: ต้องระบุ styles { font: 'Sarabun' } เพื่อให้ในตารางแสดงภาษาไทย
+  doc.autoTable({
+    startY: 95,
+    head: [['รายการวัสดุคุณภาพจาก PK Group', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'รวมเป็นเงิน']],
+    body: [
+      [
+        'ลวดหนาม (Barbed Wire)', 
+        data.totalRolls, 
+        'ม้วน', 
+        (data.wireCost / data.totalRolls).toLocaleString(), 
+        data.wireCost.toLocaleString()
+      ],
+      [
+        'เสารั้วลวดหนาม (Fence Posts)', 
+        data.totalPosts, 
+        'ต้น', 
+        (data.postCost / data.totalPosts).toLocaleString(), 
+        data.postCost.toLocaleString()
+      ]
+    ],
+    foot: [
+      [
+        { content: 'ยอดรวมงบประมาณวัสดุทั้งสิ้น (โดยประมาณ)', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } },
+        { content: `฿${data.totalBudget.toLocaleString()}`, styles: { halign: 'left', fontStyle: 'bold', textColor: [22, 163, 74] } }
+      ]
+    ],
+    styles: { 
+      font: fontName, 
+      fontStyle: 'normal',
+      fontSize: 10,
+      cellPadding: 5
+    },
+    headStyles: { 
+      fillColor: [30, 58, 138], 
+      textColor: [255, 255, 255],
+      halign: 'center'
+    },
+    columnStyles: {
+      1: { halign: 'center' },
+      2: { halign: 'center' },
+      3: { halign: 'right' },
+      4: { halign: 'right' }
+    },
+    margin: { left: 15, right: 15 }
+  });
+
+  // 5. หมายเหตุท้ายเอกสาร
+  const finalY = doc.lastAutoTable.finalY + 15;
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text("หมายเหตุ:", 15, finalY);
+  doc.setFontSize(9);
+  doc.text("• ราคาที่แสดงเป็นการคำนวณเบื้องต้นเพื่อประเมินงบประมาณวัสดุเท่านั้น ไม่รวมค่าแรงติดตั้ง", 15, finalY + 6);
+  doc.text("• กรุณานำใบประเมินนี้ติดต่อเช็คราคาปัจจุบันและสั่งซื้อได้ที่ Line: @pkgroup หรือเว็บไซต์ www.pkgroupth.com", 15, finalY + 11);
+
+  // 6. บันทึกและดาวน์โหลดไฟล์
+  const fileName = `Fence-Quotation-${data.perimeter}m.pdf`;
+  doc.save(fileName);
+};
