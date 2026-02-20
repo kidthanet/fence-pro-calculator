@@ -10,10 +10,34 @@ export default function WireComparison({ totalPerimeter }) {
   const rollsNeeded = (currentPerimeter <= 50) ? 1 : Math.ceil(currentPerimeter / 50);
 
   const tensileNetOptions = [
-    { h: "1.0 ม.", model: "รุ่น 7 ช่อง", pricePerRoll: 2100, desc: "ความสูงมาตรฐาน สำหรับกั้นสัตว์เล็ก" },
-    { h: "1.2 ม.", model: "รุ่น 9 ช่อง", pricePerRoll: 2500, desc: "ความสูงยอดนิยม ป้องกันสุนัขและสัตว์ทั่วไป" },
-    { h: "1.5 ม.", model: "รุ่น 10 ช่อง", pricePerRoll: 2800, desc: "ความสูงพิเศษ ป้องกันการกระโดด" },
-    { h: "2.0 ม.", model: "รุ่น 12 ช่อง", pricePerRoll: 3500, desc: "ความสูงสูงสุด เพื่อความปลอดภัยระดับสูงสุด" }
+    { 
+      h: "1.0 ม.", 
+      model: "รุ่น 7 ช่อง", 
+      pricePerRoll: 2100, 
+      desc: "ความสูงมาตรฐาน สำหรับกั้นสัตว์เล็ก",
+      url: "https://www.pkgroupth.com/product/50m-high-tensile-fencing-yellow-series/" // ใส่ลิงก์ของพี่เอ๋ตรงนี้ครับ
+    },
+    { 
+      h: "1.2 ม.", 
+      model: "รุ่น 9 ช่อง", 
+      pricePerRoll: 2500, 
+      desc: "ความสูงยอดนิยม ป้องกันสุนัขและสัตว์ทั่วไป",
+      url: "https://www.pkgroupth.com/product/50m-high-tensile-fencing-yellow-series/" 
+    },
+    { 
+      h: "1.5 ม.", 
+      model: "รุ่น 10 ช่อง", 
+      pricePerRoll: 2800, 
+      desc: "ความสูงพิเศษ ป้องกันการกระโดด",
+      url: "https://www.pkgroupth.com/product/50m-high-tensile-fencing-red-series/" 
+    },
+    { 
+      h: "2.0 ม.", 
+      model: "รุ่น 12 ช่อง", 
+      pricePerRoll: 3500, 
+      desc: "ความสูงสูงสุด เพื่อความปลอดภัยระดับสูงสุด",
+      url: "https://www.pkgroupth.com/product/50m-high-tensile-fencing-red-series/" 
+    }
   ];
 
   return (
@@ -28,11 +52,17 @@ export default function WireComparison({ totalPerimeter }) {
           const totalPrice = rollsNeeded * item.pricePerRoll;
           
           return (
-            <div key={index} className="bg-slate-800/40 border border-white/5 p-4 rounded-2xl">
+            <a 
+              key={index} 
+              href={item.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block bg-slate-800/40 border border-white/5 p-4 rounded-2xl hover:bg-slate-700/60 hover:border-blue-500/50 transition-all group cursor-pointer"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <span className="text-blue-400 font-black text-lg mr-2">สูง {item.h}</span>
+                    <span className="text-blue-400 font-black text-lg mr-2 group-hover:text-blue-300">สูง {item.h}</span>
                     <span className="bg-slate-700 text-[10px] px-2 py-0.5 rounded text-slate-300">
                       {item.model}
                     </span>
@@ -40,15 +70,19 @@ export default function WireComparison({ totalPerimeter }) {
                   <p className="text-[11px] text-slate-500 mt-1">{item.desc}</p>
                 </div>
                 <div className="text-right">
-                  <span className="block text-green-400 font-bold text-xl">
+                  <span className="block text-green-400 font-bold text-xl group-hover:scale-105 transition-transform">
                     ฿{totalPrice.toLocaleString()}
                   </span>
                   <p className="text-[10px] text-slate-600 italic">
                     {rollsNeeded > 1 ? `คำนวณจาก ${rollsNeeded} ม้วน` : "ราคายืนพื้น/ม้วน"}
                   </p>
+                  {/* เพิ่มไกด์ไลน์เล็กๆ ให้รู้ว่ากดได้ */}
+                  <span className="text-[9px] text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                    ดูรายละเอียดสินค้า →
+                  </span>
                 </div>
               </div>
-            </div>
+            </a>
           );
         })}
       </div>
